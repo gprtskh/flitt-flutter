@@ -21,21 +21,16 @@ class Api {
 
   Api.withHttpClient(this._platformSpecific, this._httpClient, this._logging);
 
-  Api(PlatformSpecific platformSpecific)
-      : this.withHttpClient(platformSpecific, http.Client(), kDebugMode);
+  Api(PlatformSpecific platformSpecific) : this.withHttpClient(platformSpecific, http.Client(), kDebugMode);
 
   Future<dynamic> getPaymentConfig(
-      {String? token,
-      int? merchantId,
-      int? amount,
-      String? currency,
-      String? methodId,
-      String? methodName}) async {
+      {String? token, int? merchantId, int? amount, String? currency, String? methodId, String? methodName}) async {
     final Map<String, dynamic> request = HashMap();
     if (token != null) {
       request['token'] = token;
     } else {
       request['merchant_id'] = merchantId;
+      print('MERCHANT ID: $merchantId');
       request['amount'] = amount;
       request['currency'] = currency;
     }
@@ -53,11 +48,9 @@ class Api {
     }
     if (data == null) {
       if (token != null) {
-        throw UnsupportedError(
-            '$methodName is not supported for token "$token"');
+        throw UnsupportedError('$methodName is not supported for token "$token"');
       } else {
-        throw UnsupportedError(
-            '$methodName is not supported for merchant $merchantId and currency $currency');
+        throw UnsupportedError('$methodName is not supported for merchant $merchantId and currency $currency');
       }
     }
     final totalDetails = response['details']['total'];
@@ -82,8 +75,7 @@ class Api {
     if (order.paymentSystems != null && order.paymentSystems!.isNotEmpty) {
       request['payment_systems'] = order.paymentSystems;
     }
-    if (order.defaultPaymentSystem != null &&
-        order.defaultPaymentSystem!.isNotEmpty) {
+    if (order.defaultPaymentSystem != null && order.defaultPaymentSystem!.isNotEmpty) {
       request['default_payment_system'] = order.defaultPaymentSystem;
     }
     if (order.lifetime != -1) {
@@ -97,8 +89,7 @@ class Api {
     if (order.version != null && order.version!.isNotEmpty) {
       request['version'] = order.version;
     }
-    if (order.serverCallbackUrl != null &&
-        order.serverCallbackUrl!.isNotEmpty) {
+    if (order.serverCallbackUrl != null && order.serverCallbackUrl!.isNotEmpty) {
       request['server_callback_url'] = order.serverCallbackUrl;
     }
     if (order.reservationData != null && order.reservationData!.isNotEmpty) {
@@ -118,28 +109,25 @@ class Api {
     request['response_url'] = URL_CALLBACK;
     request['delayed'] = order.delayed ? 'Y' : 'N';
 
+    print('getToken request: $request');
     final response = await _call('api/checkout/token', request);
     final String token = response['token'];
     return token;
   }
 
   Future<Receipt> getOrder(String token) async {
-    final response =
-        await _call('api/checkout/merchant/order', {'token': token});
-    final receipt =
-        Receipt.fromJson(response['order_data'], response['response_url']);
+    final response = await _call('api/checkout/merchant/order', {'token': token});
+    final receipt = Receipt.fromJson(response['order_data'], response['response_url']);
     if (receipt == null) {
       throw CloudipspError('Unable to parse receipt');
     }
     return receipt;
   }
 
-  Future<dynamic> checkout(PrivateCreditCard creditCard, String token,
-      String? email, String callbackUrl) {
+  Future<dynamic> checkout(PrivateCreditCard creditCard, String token, String? email, String callbackUrl) {
     final Map<String, dynamic> request = HashMap();
     request['card_number'] = creditCard.cardNumber;
-    request['expiry_date'] =
-        _expMmFormat(creditCard.mm) + creditCard.yy.toString();
+    request['expiry_date'] = _expMmFormat(creditCard.mm) + creditCard.yy.toString();
     request['cvv2'] = creditCard.cvv.toString();
     request['payment_system'] = 'card';
     request['token'] = token;
@@ -149,8 +137,7 @@ class Api {
     return _call('api/checkout/ajax', request);
   }
 
-  Future<dynamic> checkoutNativePay(
-      String token, String? email, String paymentSystem, dynamic data) {
+  Future<dynamic> checkoutNativePay(String token, String? email, String paymentSystem, dynamic data) {
     final Map<String, dynamic> request = HashMap();
     request['token'] = token;
     if (email != null && email.isNotEmpty) {
@@ -195,8 +182,7 @@ class Api {
     headers['Accept'] = 'application/json';
     headers['Content-Type'] = 'application/json';
 
-    final response = await _httpClient.post(Uri.parse(url),
-        headers: headers, body: requestBody);
+    final response = await _httpClient.post(Uri.parse(url), headers: headers, body: requestBody);
 
     if (_logging) {
       print('Response. $url ${response.body}');
@@ -205,18 +191,13 @@ class Api {
     final responseRootJson = jsonDecode(response.body);
     final responseJson = responseRootJson['response'];
     if (responseJson['error_message'] != null) {
-      throw CloudipspApiError(responseJson['error_code'],
-          responseJson['request_id'], responseJson['error_message']);
+      throw CloudipspApiError(responseJson['error_code'], responseJson['request_id'], responseJson['error_message']);
     }
     return responseJson;
   }
 
   Map<String, String> _headers() {
-    return {
-      'User-Agent': 'Flutter',
-      'SDK-OS': _platformSpecific.operatingSystem,
-      'SDK-Version': '0.4.1'
-    };
+    return {'User-Agent': 'Flutter', 'SDK-OS': _platformSpecific.operatingSystem, 'SDK-Version': '0.4.1'};
   }
 
   static _expMmFormat(int expMm) {

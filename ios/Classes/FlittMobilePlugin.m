@@ -60,6 +60,14 @@ API_AVAILABLE(ios(11.0))
 
     dispatch_async(dispatch_get_main_queue(), ^{
         PKPaymentAuthorizationViewController *controller = [[PKPaymentAuthorizationViewController alloc] initWithPaymentRequest:paymentRequest];
+        if (controller == nil) {
+            NSLog(@"ApplePay Error: Unable to create controller. merchantIdentifier: %@", [data objectForKey:@"merchantIdentifier"]);
+            self.applePayResult([FlutterError errorWithCode:@"ApplePayNotAvailable"
+                                                   message:@"Unable to create Apple Pay controller. Check merchantIdentifier, entitlements, and device capability."
+                                                   details:nil]);
+            self.applePayResult = nil;
+            return;
+        }
         controller.delegate = self;
         UIViewController *topViewController = [UIApplication sharedApplication].keyWindow.rootViewController;
         [topViewController presentViewController:controller animated:YES completion:nil];

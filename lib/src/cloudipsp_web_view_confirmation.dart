@@ -17,6 +17,6 @@ class PrivateCloudipspWebViewConfirmation extends CloudipspWebViewConfirmation {
   final http.Response response;
   final Completer<Receipt?> completer;
 
-  PrivateCloudipspWebViewConfirmation(this.native, this.apiHost, this.baseUrl,
-      this.callbackUrl, this.response, this.completer);
+  PrivateCloudipspWebViewConfirmation(
+      this.native, this.apiHost, this.baseUrl, this.callbackUrl, this.response, this.completer);
 }

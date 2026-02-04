@@ -19,9 +19,7 @@ import 'deviceInfoProvider.dart';
 typedef void CloudipspWebViewHolder(CloudipspWebViewConfirmation confirmation);
 
 abstract class Cloudipsp {
-  factory Cloudipsp(
-          int merchantId, CloudipspWebViewHolder cloudipspWebViewHolder) =
-      CloudipspImpl;
+  factory Cloudipsp(int merchantId, CloudipspWebViewHolder cloudipspWebViewHolder) = CloudipspImpl;
 
   int get merchantId;
 
@@ -35,7 +33,7 @@ abstract class Cloudipsp {
 
   Future<Receipt> payToken(CreditCard card, String token);
 
-  Future<Receipt> applePay(Order order);
+  Future<Receipt> applePay(Order order, {int? displayAmount});
 
   Future<Receipt> applePayToken(String token);
 
@@ -49,12 +47,9 @@ abstract class Cloudipsp {
 
   Future<List<Bank>> getAvailableBankListByToken(String token);
 
-  Future<BankRedirectDetails> initiateBankPayment(Bank bank, Order order,
-      {bool autoRedirect = true});
+  Future<BankRedirectDetails> initiateBankPayment(Bank bank, Order order, {bool autoRedirect = true});
 
-  Future<BankRedirectDetails> initiateBankPaymentByToken(
-      String token, Bank bank,
-      {bool autoRedirect = true});
+  Future<BankRedirectDetails> initiateBankPaymentByToken(String token, Bank bank, {bool autoRedirect = true});
 }
 
 class CloudipspImpl implements Cloudipsp {
@@ -119,8 +114,7 @@ class CloudipspImpl implements Cloudipsp {
       throw ArgumentError("CreditCard is not valid");
     }
     final token = await _api.getToken(merchantId, order);
-    final checkoutResponse =
-        await _api.checkout(card, token, order.email, Api.URL_CALLBACK);
+    final checkoutResponse = await _api.checkout(card, token, order.email, Api.URL_CALLBACK);
     return _payContinue(checkoutResponse, token, Api.URL_CALLBACK);
   }
 
@@ -130,36 +124,34 @@ class CloudipspImpl implements Cloudipsp {
       throw ArgumentError("CreditCard is not valid");
     }
     final order = await _api.getOrder(token);
-    final checkoutResponse =
-        await _api.checkout(card, token, null, order.responseUrl);
+    final checkoutResponse = await _api.checkout(card, token, null, order.responseUrl);
     return await _payContinue(checkoutResponse, token, Api.URL_CALLBACK);
   }
 
   @override
-  Future<Receipt> applePay(Order order) async {
+  Future<Receipt> applePay(Order order, {int? displayAmount}) async {
     if (!(merchantId > 0)) {
       throw ArgumentError.value(merchantId, 'merchantId');
     }
     _assertApplePay();
-    final config = await _api.getPaymentConfig(
+    dynamic config = await _api.getPaymentConfig(
       merchantId: merchantId,
       amount: order.amount,
       currency: order.currency,
       methodId: 'https://apple.com/apple-pay',
       methodName: 'ApplePay',
     );
+
     dynamic applePayInfo;
     try {
-      applePayInfo = await _native.applePay(
-          config, order.amount, order.currency, order.description);
+      applePayInfo = await _native.applePay(config, displayAmount ?? order.amount, order.currency, order.description);
     } on PlatformException catch (e) {
       throw CloudipspUserError(e.code, e.message);
     }
 
     try {
       final token = await _api.getToken(merchantId, order);
-      final checkout = await _api.checkoutNativePay(
-          token, order.email, config['payment_system'], applePayInfo);
+      final checkout = await _api.checkoutNativePay(token, order.email, config['payment_system'], applePayInfo);
       final receipt = await _payContinue(checkout, token, Api.URL_CALLBACK);
       await _native.applePayComplete(true);
       return receipt;
@@ -181,15 +173,13 @@ class CloudipspImpl implements Cloudipsp {
     final order = await _api.getOrder(token);
     dynamic applePayInfo;
     try {
-      applePayInfo =
-          await _native.applePay(config, order.amount, order.currency, ' ');
+      applePayInfo = await _native.applePay(config, order.amount, order.currency, ' ');
     } on PlatformException catch (e) {
       throw CloudipspUserError(e.code, e.message);
     }
 
     try {
-      final checkout = await _api.checkoutNativePay(
-          token, null, config['payment_system'], applePayInfo);
+      final checkout = await _api.checkoutNativePay(token, null, config['payment_system'], applePayInfo);
       final receipt = await _payContinue(checkout, token, order.responseUrl);
       await _native.applePayComplete(true);
       return receipt;
@@ -215,8 +205,7 @@ class CloudipspImpl implements Cloudipsp {
     }
 
     final token = await _api.getToken(merchantId, order);
-    final checkout = await _api.checkoutNativePay(
-        token, order.email, config['payment_system'], googlePayInfo);
+    final checkout = await _api.checkoutNativePay(token, order.email, config['payment_system'], googlePayInfo);
     return _payContinue(checkout, token, Api.URL_CALLBACK);
   }
 
@@ -244,8 +233,8 @@ class CloudipspImpl implements Cloudipsp {
       throw CloudipspUserError(e.code, e.message);
     }
 
-    final checkout = await _api.checkoutNativePay(
-        token, null, config['payment_system'], googlePayInfo);
+    final checkout = await _api.checkoutNativePay(token, null, config['payment_system'], googlePayInfo);
+
     return _payContinue(checkout, token, order.responseUrl);
   }
 
@@ -295,27 +284,22 @@ class CloudipspImpl implements Cloudipsp {
 
       return banks;
     } catch (e) {
-      throw CloudipspError(
-          'Failed to get available bank list: ${e.toString()}');
+      throw CloudipspError('Failed to get available bank list: ${e.toString()}');
     }
   }
 
   @override
-  Future<BankRedirectDetails> initiateBankPayment(Bank bank, Order order,
-      {bool autoRedirect = true}) async {
+  Future<BankRedirectDetails> initiateBankPayment(Bank bank, Order order, {bool autoRedirect = true}) async {
     final token = await _api.getToken(merchantId, order);
     return initiateBankPaymentByToken(token, bank, autoRedirect: autoRedirect);
   }
 
   @override
-  Future<BankRedirectDetails> initiateBankPaymentByToken(
-      String token, Bank bank,
-      {bool autoRedirect = true}) async {
+  Future<BankRedirectDetails> initiateBankPaymentByToken(String token, Bank bank, {bool autoRedirect = true}) async {
     try {
       // Get device info
       final deviceInfoProvider = DeviceInfoProvider();
-      final deviceFingerprint =
-          await deviceInfoProvider.getEncodedDeviceFingerprint();
+      final deviceFingerprint = await deviceInfoProvider.getEncodedDeviceFingerprint();
 
       // Get order information
       final receipt = await _api.getAjaxInfo(token);
@@ -331,24 +315,17 @@ class CloudipspImpl implements Cloudipsp {
         'kkh': deviceFingerprint,
       };
 
-      print("requestObject: " + deviceFingerprint);
-
       final response = await _api.callAjax(requestObj);
 
       final responseStatus = response['response_status'] ?? '';
       final action = response['action'] ?? '';
 
-      if (responseStatus == 'success' &&
-          action == 'redirect' &&
-          response.containsKey('url')) {
+      if (responseStatus == 'success' && action == 'redirect' && response.containsKey('url')) {
         final redirectUrl = response['url'];
         final target = response['target'] ?? '_top';
 
-        final bankRedirectDetails = BankRedirectDetails(
-            action: action,
-            url: redirectUrl,
-            target: target,
-            responseStatus: responseStatus);
+        final bankRedirectDetails =
+            BankRedirectDetails(action: action, url: redirectUrl, target: target, responseStatus: responseStatus);
 
         if (autoRedirect) {
           await _launchUrl(redirectUrl);
@@ -356,8 +333,7 @@ class CloudipspImpl implements Cloudipsp {
 
         return bankRedirectDetails;
       } else {
-        throw CloudipspError(
-            'Payment initiation failed: payment status: $responseStatus, action: $action');
+        throw CloudipspError('Payment initiation failed: payment status: $responseStatus, action: $action');
       }
     } catch (e) {
       throw CloudipspError('Failed to initiate bank payment: ${e.toString()}');
@@ -367,15 +343,13 @@ class CloudipspImpl implements Cloudipsp {
   Future<bool> _launchUrl(String url) async {
     final uri = Uri.parse(url);
     if (await launcher.canLaunchUrl(uri)) {
-      return await launcher.launchUrl(uri,
-          mode: launcher.LaunchMode.externalApplication);
+      return await launcher.launchUrl(uri, mode: launcher.LaunchMode.externalApplication);
     } else {
       throw Exception('Could not launch URL: $url');
     }
   }
 
-  Future<Receipt> _payContinue(
-      dynamic checkoutResponse, String token, String callbackUrl) async {
+  Future<Receipt> _payContinue(dynamic checkoutResponse, String token, String callbackUrl) async {
     final url = checkoutResponse['url'] as String;
     if (!url.startsWith(callbackUrl)) {
       final receipt = await _threeDS(url, checkoutResponse, callbackUrl);
@@ -386,8 +360,7 @@ class CloudipspImpl implements Cloudipsp {
     return _api.getOrder(token);
   }
 
-  Future<Receipt?> _threeDS(
-      String url, dynamic checkoutResponse, String callbackUrl) async {
+  Future<Receipt?> _threeDS(String url, dynamic checkoutResponse, String callbackUrl) async {
     String body;
     String contentType;
 
@@ -407,8 +380,8 @@ class CloudipspImpl implements Cloudipsp {
 
     final response = await _api.call3ds(url, body, contentType);
     final completer = new Completer<Receipt?>();
-    _cloudipspWebViewHolder(PrivateCloudipspWebViewConfirmation(
-        _native, Api.API_HOST, url, callbackUrl, response, completer));
+    _cloudipspWebViewHolder(
+        PrivateCloudipspWebViewConfirmation(_native, Api.API_HOST, url, callbackUrl, response, completer));
     return completer.future;
   }
 }

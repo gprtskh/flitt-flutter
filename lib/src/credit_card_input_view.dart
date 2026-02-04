@@ -39,14 +39,8 @@ class CreditCardInputView extends StatefulWidget {
   }
 }
 
-class CreditCardInputViewState extends State<CreditCardInputView>
-    implements CreditCardInputState {
-  static const _HELP_CARDS = [
-    '4444555566661111',
-    '4444111166665555',
-    '4444555511116666',
-    '4444111155556666'
-  ];
+class CreditCardInputViewState extends State<CreditCardInputView> implements CreditCardInputState {
+  static const _HELP_CARDS = ['4444555566661111', '4444111166665555', '4444555511116666', '4444111155556666'];
 
   final bool _helperNeeded;
   final InputDecoration? _inputNumberDecoration;
@@ -77,24 +71,20 @@ class CreditCardInputViewState extends State<CreditCardInputView>
     if (_creditCardInputLayoutKey.currentState == null) {
       throw StateError("CreditCardInputView hasn't been rendered yet");
     }
-    final creditCardInputLayoutState =
-        _creditCardInputLayoutKey.currentState as CreditCardInputLayoutState;
+    final creditCardInputLayoutState = _creditCardInputLayoutKey.currentState as CreditCardInputLayoutState;
     return creditCardInputLayoutState.getCard();
   }
 
   void _nextHelpCard() {
-    final creditCardInputLayoutState =
-        _creditCardInputLayoutKey.currentState as CreditCardInputLayoutState;
+    final creditCardInputLayoutState = _creditCardInputLayoutKey.currentState as CreditCardInputLayoutState;
 
     _currentHelpCardIndex %= _HELP_CARDS.length;
-    creditCardInputLayoutState.setHelpCard(
-        _HELP_CARDS[_currentHelpCardIndex++], '12', '29', '111');
+    creditCardInputLayoutState.setHelpCard(_HELP_CARDS[_currentHelpCardIndex++], '12', '29', '111');
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget cardNumberLabel =
-        Text('CardNumber:', textDirection: TextDirection.ltr);
+    Widget cardNumberLabel = Text('CardNumber:', textDirection: TextDirection.ltr);
     if (_helperNeeded) {
       cardNumberLabel = GestureDetector(
         onTap: _nextHelpCard,
@@ -108,8 +98,7 @@ class CreditCardInputViewState extends State<CreditCardInputView>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             cardNumberLabel,
-            CreditCardNumberField(
-                decoration: _oneOf(_inputNumberDecoration, _inputDecoration)),
+            CreditCardNumberField(decoration: _oneOf(_inputNumberDecoration, _inputDecoration)),
             SizedBox(
               height: 15.0,
             ),
@@ -121,9 +110,7 @@ class CreditCardInputViewState extends State<CreditCardInputView>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Exp. Year', textDirection: TextDirection.ltr),
-                        CreditCardExpYyField(
-                            decoration: _oneOf(
-                                _inputExpYyDecoration, _inputDecoration)),
+                        CreditCardExpYyField(decoration: _oneOf(_inputExpYyDecoration, _inputDecoration)),
                       ],
                     )),
                 SizedBox(
@@ -135,9 +122,7 @@ class CreditCardInputViewState extends State<CreditCardInputView>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Exp. Month', textDirection: TextDirection.ltr),
-                        CreditCardExpMmField(
-                            decoration: _oneOf(
-                                _inputExpMmDecoration, _inputDecoration)),
+                        CreditCardExpMmField(decoration: _oneOf(_inputExpMmDecoration, _inputDecoration)),
                       ],
                     )),
               ],
@@ -146,14 +131,12 @@ class CreditCardInputViewState extends State<CreditCardInputView>
               height: 15.0,
             ),
             Text('Cvv:', textDirection: TextDirection.ltr),
-            CreditCardCvvField(
-                decoration: _oneOf(_inputCvvDecoration, _inputDecoration))
+            CreditCardCvvField(decoration: _oneOf(_inputCvvDecoration, _inputDecoration))
           ],
         ));
   }
 
-  static InputDecoration? _oneOf(
-      InputDecoration? main, InputDecoration? alternative) {
+  static InputDecoration? _oneOf(InputDecoration? main, InputDecoration? alternative) {
     if (main != null) {
       return main;
     }

@@ -28,8 +28,7 @@ class CloudipspWebViewImpl extends StatefulWidget implements CloudipspWebView {
 }
 
 class _CloudipspWebViewImplState extends State<CloudipspWebViewImpl> {
-  static const URL_START_PATTERN =
-      'http://secure-redirect.cloudipsp.com/submit/#';
+  static const URL_START_PATTERN = 'http://secure-redirect.cloudipsp.com/submit/#';
   static const ADD_VIEWPORT_METADATA = '''(() => {
     const meta = document.createElement('meta');
     meta.setAttribute('content', 'width=device-width, user-scalable=0,');
@@ -84,8 +83,7 @@ class _CloudipspWebViewImplState extends State<CloudipspWebViewImpl> {
     if (!detectsStartPattern) {
       detectsCallbackUrl = url.startsWith(widget._confirmation.callbackUrl);
       if (!detectsCallbackUrl) {
-        detectsApiToken = url.startsWith(
-            '${widget._confirmation.apiHost}/api/checkout?token=');
+        detectsApiToken = url.startsWith('${widget._confirmation.apiHost}/api/checkout?token=');
       }
     }
 
@@ -99,8 +97,7 @@ class _CloudipspWebViewImplState extends State<CloudipspWebViewImpl> {
         } catch (e) {
           response = jsonDecode(Uri.decodeComponent(jsonOfConfirmation));
         }
-        receipt =
-            Receipt.fromJson(response['params'], response['url']);
+        receipt = Receipt.fromJson(response['params'], response['url']);
       }
       widget._confirmation.completer.complete(receipt);
       return NavigationDecision.prevent;

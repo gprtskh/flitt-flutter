@@ -11,12 +11,10 @@ import './credit_card_number_field.dart';
 import './credit_card.dart';
 
 abstract class CreditCardInputLayout extends Widget {
-  factory CreditCardInputLayout({Key? key, required Widget child}) =
-      CreditCardInputLayoutImpl;
+  factory CreditCardInputLayout({Key? key, required Widget child}) = CreditCardInputLayoutImpl;
 }
 
-class CreditCardInputLayoutImpl extends StatefulWidget
-    implements CreditCardInputLayout {
+class CreditCardInputLayoutImpl extends StatefulWidget implements CreditCardInputLayout {
   final Widget _child;
 
   CreditCardInputLayoutImpl({Key? key, required Widget child})
@@ -33,8 +31,7 @@ abstract class CreditCardInputState {
   CreditCard getCard();
 }
 
-class CreditCardInputLayoutState extends State<CreditCardInputLayoutImpl>
-    implements CreditCardInputState {
+class CreditCardInputLayoutState extends State<CreditCardInputLayoutImpl> implements CreditCardInputState {
   final Widget _child;
   final CreditCardNumberFieldImpl _number;
   final CreditCardExpMmFieldImpl _expMm;
@@ -61,11 +58,8 @@ class CreditCardInputLayoutState extends State<CreditCardInputLayoutImpl>
 
   @override
   CreditCard getCard() {
-    return PrivateCreditCard(
-        _number.textEditingController.text,
-        int.tryParse(_expMm.textEditingController.text) ?? -1,
-        int.tryParse(_expYy.textEditingController.text) ?? -1,
-        _cvv.textEditingController.text);
+    return PrivateCreditCard(_number.textEditingController.text, int.tryParse(_expMm.textEditingController.text) ?? -1,
+        int.tryParse(_expYy.textEditingController.text) ?? -1, _cvv.textEditingController.text);
   }
 
   @override

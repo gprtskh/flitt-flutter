@@ -49,9 +49,7 @@ class Order {
     if (description.length == 0 || description.length > 1024) {
       throw ArgumentError("description's length should be > 0 && <= 1024");
     }
-    if (email != null &&
-        email!.isNotEmpty &&
-        !EmailValidator.validate(email!)) {
+    if (email != null && email!.isNotEmpty && !EmailValidator.validate(email!)) {
       throw ArgumentError("email is not valid");
     }
   }
@@ -73,8 +71,7 @@ class Order {
 
   set merchantData(String? value) {
     if (value != null && value.length > 2048) {
-      throw new ArgumentError(
-          "MerchantData should be not more than 2048 symbols");
+      throw new ArgumentError("MerchantData should be not more than 2048 symbols");
     }
     _merchantData = value;
   }
@@ -96,8 +93,7 @@ class Order {
 
   set serverCallbackUrl(String? value) {
     if (value != null && value.length > 2048) {
-      throw ArgumentError(
-          "server callback url should be not more than 2048 symbols");
+      throw ArgumentError("server callback url should be not more than 2048 symbols");
     }
     _serverCallbackUrl = value;
   }

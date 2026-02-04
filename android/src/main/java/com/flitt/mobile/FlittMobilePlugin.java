@@ -32,6 +32,8 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry;
 
+import com.flitt.mobile.GooglePayButton.GooglePayButtonPlugin;
+
 
 public class FlittMobilePlugin implements
         ActivityAware,
@@ -44,12 +46,16 @@ public class FlittMobilePlugin implements
     private Context applicationContext;
     private MethodChannel channel;
     private Result activeGooglePayResult;
+    private GooglePayButtonPlugin googlePayButtonPlugin;
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
         applicationContext = flutterPluginBinding.getApplicationContext();
         channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "cloudipsp_mobile");
         channel.setMethodCallHandler(this);
+
+        googlePayButtonPlugin = new GooglePayButtonPlugin();
+        googlePayButtonPlugin.onAttachedToEngine(flutterPluginBinding);
     }
 
     @Override
@@ -57,6 +63,11 @@ public class FlittMobilePlugin implements
         channel.setMethodCallHandler(null);
         channel = null;
         applicationContext = null;
+
+        if (googlePayButtonPlugin != null) {
+            googlePayButtonPlugin.onDetachedFromEngine(binding);
+            googlePayButtonPlugin = null;
+        }
     }
 
     @Override
@@ -137,6 +148,10 @@ public class FlittMobilePlugin implements
     public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
         activityPluginBinding = binding;
         binding.addActivityResultListener(this);
+
+        if (googlePayButtonPlugin != null) {
+            googlePayButtonPlugin.onAttachedToActivity(binding);
+        }
     }
 
     @Override
@@ -145,16 +160,24 @@ public class FlittMobilePlugin implements
             activityPluginBinding.removeActivityResultListener(this);
             activityPluginBinding = null;
         }
+
+        if (googlePayButtonPlugin != null) {
+            googlePayButtonPlugin.onDetachedFromActivity();
+        }
     }
 
     @Override
     public void onDetachedFromActivityForConfigChanges() {
-
+        if (googlePayButtonPlugin != null) {
+            googlePayButtonPlugin.onDetachedFromActivityForConfigChanges();
+        }
     }
 
     @Override
     public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
-
+        if (googlePayButtonPlugin != null) {
+            googlePayButtonPlugin.onReattachedToActivityForConfigChanges(binding);
+        }
     }
 
     @Override

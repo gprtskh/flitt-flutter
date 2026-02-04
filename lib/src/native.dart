@@ -21,8 +21,7 @@ class Native {
     return result as bool;
   }
 
-  Future<dynamic> applePay(
-      dynamic config, int amount, String currency, String description) {
+  Future<dynamic> applePay(dynamic config, int amount, String currency, String description) {
     return _channel.invokeMethod('applePay', {
       'config': config,
       'amount': amount,

@@ -9,18 +9,17 @@ class Bank {
   String _bankLogo;
   String _alias;
 
-  Bank({
-    required String bankId,
-    required int countryPriority,
-    required int userPriority,
-    required bool quickMethod,
-    required bool userPopular,
-    required String name,
-    required String country,
-    required String bankLogo,
-    required String alias
-  }) :
-        _bankId = bankId,
+  Bank(
+      {required String bankId,
+      required int countryPriority,
+      required int userPriority,
+      required bool quickMethod,
+      required bool userPopular,
+      required String name,
+      required String country,
+      required String bankLogo,
+      required String alias})
+      : _bankId = bankId,
         _countryPriority = countryPriority,
         _userPriority = userPriority,
         _quickMethod = quickMethod,

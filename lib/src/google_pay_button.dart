@@ -66,8 +66,7 @@ class _GooglePayButtonState extends State<GooglePayButton> {
   Future<void> _initializeCloudipsp() async {
     _cloudipsp = Cloudipsp(widget.merchantId, widget.webViewHolder);
     try {
-      final paymentConfig = await _cloudipsp
-          .initializePaymentConfig(widget.order, token: widget.token);
+      final paymentConfig = await _cloudipsp.initializePaymentConfig(widget.order, token: widget.token);
       setState(() {
         config = paymentConfig;
         _viewKey = UniqueKey();
@@ -108,8 +107,7 @@ class _GooglePayButtonState extends State<GooglePayButton> {
             key: _viewKey,
             viewType: 'google_pay_button_view',
             creationParams: <String, dynamic>{
-              'allowedPaymentMethods': config?['data']
-                  ?['allowedPaymentMethods'],
+              'allowedPaymentMethods': config?['data']?['allowedPaymentMethods'],
               'theme': widget.theme.toString().split('.').last,
               'type': widget.type.toString().split('.').last,
               'borderRadius': widget.borderRadius,

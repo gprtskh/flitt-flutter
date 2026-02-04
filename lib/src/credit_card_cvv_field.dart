@@ -2,19 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 abstract class CreditCardCvvField extends Widget {
-  factory CreditCardCvvField({InputDecoration? decoration}) =
-      CreditCardCvvFieldImpl;
+  factory CreditCardCvvField({InputDecoration? decoration}) = CreditCardCvvFieldImpl;
 }
 
-class CreditCardCvvFieldImpl extends StatelessWidget
-    implements CreditCardCvvField {
+class CreditCardCvvFieldImpl extends StatelessWidget implements CreditCardCvvField {
   final textEditingController = TextEditingController(text: '');
   final InputDecoration? _decoration;
-  final GlobalKey<CreditCardCvvFieldInternalState> _key =
-      GlobalKey<CreditCardCvvFieldInternalState>();
+  final GlobalKey<CreditCardCvvFieldInternalState> _key = GlobalKey<CreditCardCvvFieldInternalState>();
 
-  CreditCardCvvFieldImpl({InputDecoration? decoration})
-      : _decoration = decoration;
+  CreditCardCvvFieldImpl({InputDecoration? decoration}) : _decoration = decoration;
 
   setCvv4(bool enabled) {
     _key.currentState?.setCvv4(enabled);
@@ -30,25 +26,20 @@ class CreditCardCvvFieldInternal extends StatefulWidget {
   final TextEditingController _textEditingController;
   final InputDecoration? _decoration;
 
-  CreditCardCvvFieldInternal(
-      Key key, this._textEditingController, this._decoration)
-      : super(key: key);
+  CreditCardCvvFieldInternal(Key key, this._textEditingController, this._decoration) : super(key: key);
 
   @override
   CreditCardCvvFieldInternalState createState() {
-    return CreditCardCvvFieldInternalState(
-        this._textEditingController, this._decoration);
+    return CreditCardCvvFieldInternalState(this._textEditingController, this._decoration);
   }
 }
 
-class CreditCardCvvFieldInternalState
-    extends State<CreditCardCvvFieldInternal> {
+class CreditCardCvvFieldInternalState extends State<CreditCardCvvFieldInternal> {
   final TextEditingController _textEditingController;
   final InputDecoration? _decoration;
   int _maxLength = 3;
 
-  CreditCardCvvFieldInternalState(
-      this._textEditingController, this._decoration);
+  CreditCardCvvFieldInternalState(this._textEditingController, this._decoration);
 
   setCvv4(bool enabled) {
     setState(() {
@@ -57,8 +48,7 @@ class CreditCardCvvFieldInternalState
       } else {
         _maxLength = 3;
         if (_textEditingController.text.length == 4) {
-          _textEditingController.text =
-              _textEditingController.text.substring(0, 3);
+          _textEditingController.text = _textEditingController.text.substring(0, 3);
         }
       }
     });

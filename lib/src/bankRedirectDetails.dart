@@ -4,20 +4,16 @@ class BankRedirectDetails {
   String _target;
   String _responseStatus;
 
-  BankRedirectDetails({
-    required String action,
-    required String url,
-    required String target,
-    required String responseStatus
-  }) :
-        _action = action,
+  BankRedirectDetails(
+      {required String action, required String url, required String target, required String responseStatus})
+      : _action = action,
         _url = url,
         _target = target,
         _responseStatus = responseStatus;
 
   // Default constructor
-  BankRedirectDetails.empty() :
-        _action = '',
+  BankRedirectDetails.empty()
+      : _action = '',
         _url = '',
         _target = '',
         _responseStatus = '';
